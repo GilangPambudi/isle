@@ -17,7 +17,8 @@
  * ones ("11:10" and "isle-0.9.1" would space out). */
 .isle-compact-clock, .isle-compact-second-time, .isle-header-time, .isle-recording-time,
 .isle-timer-time, .isle-stepper-value, .isle-time, .isle-volume-text, .isle-peek-value,
-.isle-call-duration, .isle-reminders-count, .isle-cal-event-time, .isle-cal-day, .isle-usage-percent {
+.isle-call-duration, .isle-reminders-count, .isle-cal-event-time, .isle-cal-day, .isle-usage-percent,
+.isle-prayer-countdown, .isle-prayer-time {
   font-feature-settings: "tnum";
 }
 
@@ -1008,6 +1009,26 @@
 .isle-usage-dot { width: 6px; height: 6px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.22); transition-duration: 200ms; }
 .isle-usage-dot:hover { background-color: rgba(255, 255, 255, 0.45); }
 .isle-usage-dot.shown { height: 16px; background-color: #ffffff; }
+
+/* ── Prayer ───────────────────────────────────────────── */
+
+/* The next time counted down, the place on the right; the day's times below, the past dimmed and the
+ * next in MASA's green (prayer.js). */
+.isle-prayer-content { spacing: 10px; padding: 0 0 18px 0; }
+.isle-prayer-next { spacing: 2px; }
+.isle-prayer-place { spacing: 3px; }
+.isle-prayer-caption { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.isle-prayer-countdown { font-size: 34px; font-weight: 700; letter-spacing: -0.8px; }
+.isle-prayer-city { font-size: 13px; font-weight: 600; }
+.isle-prayer-bar { margin-top: 6px; }
+.isle-prayer-bar .isle-level-fill { background-color: #43db9a; }
+.isle-prayer-times { spacing: 8px; }
+.isle-prayer-cell { spacing: 2px; }
+.isle-prayer-name { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.isle-prayer-time { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+.isle-prayer-cell.past .isle-prayer-time { color: rgba(255, 255, 255, 0.5); }
+.isle-prayer-cell.next .isle-prayer-name,
+.isle-prayer-cell.next .isle-prayer-time { color: #43db9a; }
 
 /* Focused (from the keyboard), a button lights up: no ring around it. */
 .isle-pill:focus, .isle-pill-small:focus, .isle-notification-row:focus, .isle-output-button:focus,

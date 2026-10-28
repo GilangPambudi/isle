@@ -41,6 +41,7 @@ import {ShelfPage} from './pages/shelf.js';
 import {TasksPage} from './pages/tasks.js';
 import {TimerPage} from './pages/timer.js';
 import {UsagePage} from './pages/usage.js';
+import {PrayerPage} from './pages/prayer.js';
 import {ReminderWatcher} from './reminders.js';
 import {GREETING, InstalledApps, UNDO_MS, VoiceView, stopUnit, actionTypes, aiSettings, openSetUp, openSignIn, runActions, signInHint, stopPending, voiceContext} from './voice.js';
 import {TextWriter} from './writer.js';
@@ -327,6 +328,7 @@ export class Controller {
         });
         this._syncVoiceEnabled();
         this._syncUsage();
+        this._syncPrayer();
         this._syncEventAlerts();
         this._syncPages();
         // The pointer met while it was still being built (after unlocking, at rest on it) is told now.
@@ -349,6 +351,7 @@ export class Controller {
             () => new ShelfPage(this._daemon, this._clipboard, this._settings, size),
             () => new CalendarPage(this._daemon, size),
             () => new UsagePage(this._daemon, size),
+            () => new PrayerPage(this._daemon, size),
         ];
     }
 
@@ -451,6 +454,8 @@ export class Controller {
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncBotLook()));
         for (const key of ['usage-enabled', 'usage-claude', 'usage-codex', 'usage-grok', 'usage-warn', 'usage-critical'])
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncUsage()));
+        for (const key of ['prayer-enabled', 'prayer-city', 'prayer-latitude', 'prayer-longitude', 'prayer-lead-minutes'])
+            this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncPrayer()));
         for (const key of ['event-alerts', 'event-alert-minutes'])
             this._settingsChanged.push(this._settings.connect(`changed::${key}`, () => this._syncEventAlerts()));
         for (const key of ['hidden-pages', 'world-clocks'])
@@ -519,6 +524,8 @@ export class Controller {
                 this._syncUsage();
             else if (name === 'updates')
                 this._syncUpdates();
+            else if (name === 'prayer')
+                this._syncPrayer();
             else if (name === 'media')
                 this._syncLyrics();
             else if (name === 'agents')
@@ -534,6 +541,11 @@ export class Controller {
             this._post(Alerts.assistant(ok ? {phase: 'reply', reply: text} : {phase: 'error', error: text},
                 () => this._openVoice({typing: true}))));
         this._expanded.pageNamed('calendar').connect('event-soon', (_page, json) => this._onEventSoon(JSON.parse(json)));
+        this._expanded.pageNamed('prayer').connect('prayer-alert', (_page, json) => {
+            // Not in Do Not Disturb, as other alerts.
+            if (!this._notifications.dnd)
+                this._post(Alerts.prayer(JSON.parse(json), this._settings.get_string('prayer-city')));
+        });
         daemon.connect('changed', (_daemon, key) => {
             if (key === 'updates')
                 this._onLatest();
@@ -715,7 +727,7 @@ export class Controller {
     _syncPages() {
         const hidden = this._settings.get_strv('hidden-pages');
         for (const page of this._expanded.pages) {
-            if (page.name !== 'call' && page.name !== 'usage')
+            if (page.name !== 'call' && page.name !== 'usage' && page.name !== 'prayer')
                 page.hidden = hidden.includes(page.name);
         }
         this._syncUnseen();
@@ -1684,6 +1696,23 @@ export class Controller {
         };
         this._expanded.pageNamed('usage')?.setMarks(config.warn, config.critical);
         this._daemon.call('usage', 'SetConfig', JSON.stringify(config));
+    }
+
+    // Prayer
+
+    /** Sends the place to isled, and the switch, heads-up and place's name to the page. */
+    _syncPrayer() {
+        const enabled = this._settings.get_boolean('prayer-enabled');
+        this._daemon.call('prayer', 'SetConfig', JSON.stringify({
+            enabled,
+            latitude: this._settings.get_double('prayer-latitude'),
+            longitude: this._settings.get_double('prayer-longitude'),
+        }));
+        this._expanded.pageNamed('prayer').configure({
+            enabled,
+            lead: this._settings.get_int('prayer-lead-minutes'),
+            city: this._settings.get_string('prayer-city'),
+        });
     }
 
     // Voice

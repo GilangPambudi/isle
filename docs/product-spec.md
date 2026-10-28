@@ -330,6 +330,19 @@ Accounts such as Google; blue; to read, not to click) and Isle's own
 (orange; × on hover to remove), kept by `isled` and forgotten after 400
 days.
 
+**Prayer** (tab "Prayer", MASA's ring and green dot; off by default, Settings → Prayer).
+Top left: "Next · Isya at 18:38" ("tomorrow" once the day's are over), the
+time left counting down in large figures, and a thin bar of how far the wait
+from the time before has gone, in MASA's green. Top right: the place's name
+and the Hijri date. Below, the day's times in six columns (Subuh, Terbit,
+Dzuhur, Ashar, Maghrib, Isya): past ones dimmed, the next in green. The
+times are Muhammadiyah's (the KHGT service), today's and tomorrow's for the
+latitude and longitude set in Settings, asked by `isled` once a day and kept;
+only that place is sent. An alert comes at each time (all eight the service
+gives: Imsak and Dhuha too; "Time to pray" for the five prayers) and, for the
+five prayers, a set number of minutes before ("Isya in 10 min"; 0 for none).
+No tab while off or before the day's times are known.
+
 ## 6. Alerts
 
 One at a time. *Instant* alerts replace whatever is showing; the rest queue

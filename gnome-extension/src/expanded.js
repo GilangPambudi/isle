@@ -34,6 +34,7 @@ const TABS = {
     shelf: {icon: 'isle-shelf', label: 'Shelf'},
     calendar: {icon: 'isle-calendar', label: 'Calendar'},
     usage: {icon: 'isle-gauge', label: 'Usage'},
+    prayer: {icon: 'isle-masa', label: 'Prayer'},
 };
 /** How bright a tab's icon is: open, under the pointer, otherwise. */
 const TAB_OPACITY = {open: 255, hover: 230, idle: 140};

@@ -15,6 +15,7 @@ mod login_env;
 mod media;
 mod meeting;
 mod pomodoro;
+mod prayer;
 mod reminders;
 mod shelf;
 mod store;
@@ -37,6 +38,7 @@ use crate::calendar::CalendarService;
 use crate::clipboard::ClipboardService;
 use crate::media::MediaService;
 use crate::pomodoro::PomodoroService;
+use crate::prayer::PrayerService;
 use crate::reminders::RemindersService;
 use crate::shelf::ShelfService;
 use crate::system::SystemService;
@@ -124,6 +126,7 @@ async fn main() -> anyhow::Result<()> {
     let (assistant, assistant_commands) = AssistantService::new();
     let (usage, usage_refresh) = UsageService::new();
     let (updates, updates_wake) = UpdatesService::new();
+    let (prayer, prayer_wake) = PrayerService::new();
     let server = session.object_server();
     server.at(OBJECT_PATH, MediaService::default()).await?;
     server.at(OBJECT_PATH, PomodoroService::load()).await?;
@@ -136,6 +139,7 @@ async fn main() -> anyhow::Result<()> {
     server.at(OBJECT_PATH, assistant).await?;
     server.at(OBJECT_PATH, usage).await?;
     server.at(OBJECT_PATH, updates).await?;
+    server.at(OBJECT_PATH, prayer).await?;
     server.at(OBJECT_PATH, AgentsService::default()).await?;
 
     let media = server.interface::<_, MediaService>(OBJECT_PATH).await?;
@@ -147,6 +151,8 @@ async fn main() -> anyhow::Result<()> {
     tokio::spawn(usage::run(usage, usage_refresh));
     let updates = server.interface::<_, UpdatesService>(OBJECT_PATH).await?;
     tokio::spawn(updates::run(updates, updates_wake));
+    let prayer = server.interface::<_, PrayerService>(OBJECT_PATH).await?;
+    tokio::spawn(prayer::run(prayer, prayer_wake));
     let agents = server.interface::<_, AgentsService>(OBJECT_PATH).await?;
     tokio::spawn(agents::watch(agents));
     let own_data = assistant::Sources {

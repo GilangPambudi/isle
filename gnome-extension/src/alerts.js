@@ -430,6 +430,25 @@ export function meeting(event, link, join) {
     return alert;
 }
 
+/** A prayer time comes ({kind: 'soon' or 'now', key, name, prayer, at_ms} from the Prayer page), at `city`. */
+export function prayer({kind, key, name, prayer: isPrayer, at_ms: at}, city) {
+    const time = Format.timeOfDay(GLib.DateTime.new_from_unix_local(Math.floor(at / 1000)));
+    const minutes = Math.max(1, Math.round((at - Date.now()) / 60000));
+    const words = kind === 'soon' ? time : isPrayer ? 'Time to pray' : time;
+    return {
+        key: `prayer:${kind}:${key}:${at}`,
+        icon: 'isle-masa',
+        motion: 'bounce',
+        title: kind === 'soon' ? `${name} in ${minutes} min` : name,
+        subtitle: city ? `${words} · ${city}` : words,
+        tone: 'prayer',
+        page: 'prayer',
+        duration: REMINDER_DURATION,
+        // Its time only runs while someone is there to see it, as a reminder's.
+        sticky: true,
+    };
+}
+
 const AGENT_NAMES = {claude: 'Claude', codex: 'Codex', grok: 'Grok'};
 const AGENT_APPS = {claude: 'Claude Code', codex: 'Codex', grok: 'Grok'};
 /** The agent's icon and accent colour; Claude's for anything unknown. */

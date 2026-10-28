@@ -113,6 +113,12 @@ const INTERFACES = {
             <property name="Latest" type="s" access="read"/>`),
         properties: {Latest: 'updates'},
     },
+    prayer: {
+        xml: node('Prayer1', `
+            <method name="SetConfig"><arg name="config" type="s" direction="in"/></method>
+            <property name="Schedule" type="s" access="read"/>`),
+        properties: {Schedule: 'prayer'},
+    },
     agents: {
         xml: node('Agents1', `
             <method name="SetHooked"><arg name="provider" type="s" direction="in"/><arg name="on" type="b" direction="in"/></method>

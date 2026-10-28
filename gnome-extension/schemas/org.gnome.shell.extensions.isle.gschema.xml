@@ -301,6 +301,30 @@
       <default>95</default>
       <summary>Warn again at this share of a limit (%)</summary>
     </key>
+    <key name="prayer-enabled" type="b">
+      <default>false</default>
+      <summary>Show the Prayer page</summary>
+      <description>The day's prayer times from Muhammadiyah's KHGT service, and alerts before and at each. Off, nothing is asked online.</description>
+    </key>
+    <key name="prayer-city" type="s">
+      <default>'Kota Malang'</default>
+      <summary>The place's name, as the Prayer page shows it</summary>
+    </key>
+    <key name="prayer-latitude" type="d">
+      <range min="-90" max="90"/>
+      <default>-7.9771</default>
+      <summary>The place's latitude</summary>
+    </key>
+    <key name="prayer-longitude" type="d">
+      <range min="-180" max="180"/>
+      <default>112.634</default>
+      <summary>The place's longitude</summary>
+    </key>
+    <key name="prayer-lead-minutes" type="i">
+      <range min="0" max="60"/>
+      <default>10</default>
+      <summary>Minutes before a prayer to say it comes (0: not)</summary>
+    </key>
     <key name="chimes" type="b">
       <default>true</default>
       <summary>Play a sound when a focus session or break ends</summary>

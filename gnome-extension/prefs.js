@@ -30,7 +30,7 @@ const SAVE_DELAY_MS = 400;
 
 // Runs in a process of its own when Settings opens, never inside GNOME Shell.
 export default class IslePreferences extends ExtensionPreferences {
-    // Island, Clipboard, Focus Timer, Assistant, AI Usage and About, in that order.
+    // Island, Clipboard, Focus Timer, Assistant, AI Usage, Prayer and About, in that order.
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
         window.set_default_size(560, 680);
@@ -39,6 +39,7 @@ export default class IslePreferences extends ExtensionPreferences {
         window.add(this._timerPage(settings, window));
         window.add(this._voicePage(settings, window));
         window.add(this._usagePage(settings));
+        window.add(this._prayerPage(settings));
         window.add(this._aboutPage(settings, window));
         // A page asked for by the island (its Update button: About), once, also while open.
         const showAsked = () => {
@@ -96,6 +97,28 @@ export default class IslePreferences extends ExtensionPreferences {
         }));
         reset.add(resetRow);
         page.add(reset);
+        return page;
+    }
+
+    // Prayer times: the switch, the place, and the heads-up before each prayer.
+    _prayerPage(settings) {
+        const page = new Adw.PreferencesPage({title: 'Prayer', icon_name: 'alarm-symbolic'});
+        const group = new Adw.PreferencesGroup({
+            title: 'Prayer',
+            description: 'The day’s prayer times on a Prayer page in the open island, from Muhammadiyah’s ' +
+                'KHGT service, with an alert before and at each. Only the place below is sent, once a day.',
+        });
+        group.add(switchRow(settings, 'prayer-enabled', 'Show Prayer page', 'The page and its alerts'));
+        const city = new Adw.EntryRow({title: 'Place name'});
+        settings.bind('prayer-city', city, 'text', Gio.SettingsBindFlags.DEFAULT);
+        const latitude = coordinateRow(settings, 'prayer-latitude', 'Latitude', -90, 90);
+        const longitude = coordinateRow(settings, 'prayer-longitude', 'Longitude', -180, 180);
+        const lead = spinRow(settings, 'prayer-lead-minutes', 'Heads-up', 'Minutes before each prayer; 0 for none', 0, 60);
+        for (const row of [city, latitude, longitude, lead]) {
+            settings.bind('prayer-enabled', row, 'sensitive', Gio.SettingsBindFlags.GET);
+            group.add(row);
+        }
+        page.add(group);
         return page;
     }
 
@@ -774,6 +797,10 @@ function pagesGroup(settings, window) {
         usage.subtitle = 'Sign in to Claude Code or Codex to see your plan';
     }
     group.add(usage);
+    // The Prayer page's own switch too.
+    const prayer = switchRow(settings, 'prayer-enabled', 'Prayer', 'Today’s prayer times, and an alert before and at each');
+    prayer.add_prefix(new Gtk.Image({icon_name: 'alarm-symbolic'}));
+    group.add(prayer);
     // Not a page but the ✦ beside the tabs: turning it off is how to use Isle without any AI.
     const assistant = switchRow(settings, 'voice-assistant', 'AI Assistant', 'The ✦ in the open island and its shortcut');
     assistant.add_prefix(new Gtk.Image({icon_name: 'audio-input-microphone-symbolic'}));
@@ -1139,6 +1166,15 @@ function spinRow(settings, key, title, subtitle, min, max) {
     const row = Adw.SpinRow.new_with_range(min, max, 1);
     row.title = title;
     row.subtitle = subtitle;
+    settings.bind(key, row, 'value', Gio.SettingsBindFlags.DEFAULT);
+    return row;
+}
+
+/** A spin row for a latitude or longitude in degrees, to four places (about 10 m). */
+function coordinateRow(settings, key, title, min, max) {
+    const row = Adw.SpinRow.new_with_range(min, max, 0.0001);
+    row.title = title;
+    row.digits = 4;
     settings.bind(key, row, 'value', Gio.SettingsBindFlags.DEFAULT);
     return row;
 }

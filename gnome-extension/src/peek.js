@@ -52,6 +52,8 @@ const TONE_COLORS = {
     warn: Palette.ORANGE,
     break: Palette.BLUE,
     calendar: Palette.BLUE,
+    // MASA's green, as the Prayer page's (see pages/prayer.js).
+    prayer: [0.26, 0.86, 0.6],
 };
 
 /** An [r, g, b] colour, each 0 to 1, as CSS rgba(). */

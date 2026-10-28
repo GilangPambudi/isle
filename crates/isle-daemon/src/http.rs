@@ -6,7 +6,7 @@
 use std::sync::LazyLock;
 use std::time::Duration;
 
-use ureq::typestate::WithoutBody;
+use ureq::typestate::{WithBody, WithoutBody};
 use ureq::{Agent, RequestBuilder};
 
 static AGENT: LazyLock<Agent> = LazyLock::new(|| Agent::config_builder().build().into());
@@ -15,6 +15,15 @@ static AGENT: LazyLock<Agent> = LazyLock::new(|| Agent::config_builder().build()
 pub fn get(url: &str, timeout: Duration) -> RequestBuilder<WithoutBody> {
     AGENT
         .get(url)
+        .config()
+        .timeout_global(Some(timeout))
+        .build()
+}
+
+/// A POST to `url` that gives up after `timeout` in all. Blocking once sent.
+pub fn post(url: &str, timeout: Duration) -> RequestBuilder<WithBody> {
+    AGENT
+        .post(url)
         .config()
         .timeout_global(Some(timeout))
         .build()
